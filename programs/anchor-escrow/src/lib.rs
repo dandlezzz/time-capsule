@@ -35,6 +35,14 @@ pub mod anchor_escrow {
             .key;
         ctx.accounts.escrow_account.initializer_amount = initializer_amount;
         ctx.accounts.escrow_account.taker_amount = taker_amount;
+
+        let clock = Clock::get()?;
+
+        require!(
+            lock_until > clock.unix_timestamp + 5000,
+            EscrowCreationError::TimestampNotFarEnoughIntoTheFuture
+        );
+
         ctx.accounts.escrow_account.lock_until = lock_until;
 
         let (vault_authority, _vault_authority_bump) =
@@ -53,7 +61,7 @@ pub mod anchor_escrow {
         Ok(())
     }
 
-    pub fn cancel(ctx: Context<Cancel>) -> Result<()> {
+    pub fn withdrawl(ctx: Context<Withdrawl>) -> Result<()> {
         let (_vault_authority, vault_authority_bump) =
             Pubkey::find_program_address(&[ESCROW_PDA_SEED], ctx.program_id);
         let authority_seeds = &[&ESCROW_PDA_SEED[..], &[vault_authority_bump]];
@@ -85,6 +93,12 @@ pub mod anchor_escrow {
 pub enum EscrowNotUnlockable {
     #[msg("Escrow Account Not Unlockable Yet")]
     EscrowNotUnlockableYet,
+}
+
+#[error_code]
+pub enum EscrowCreationError {
+    #[msg("Lock_until not set far enough into the future")]
+    TimestampNotFarEnoughIntoTheFuture,
 }
 
 #[derive(Accounts)]
@@ -119,7 +133,7 @@ pub struct Initialize<'info> {
 }
 
 #[derive(Accounts)]
-pub struct Cancel<'info> {
+pub struct Withdrawl<'info> {
     /// CHECK: This is not dangerous because we don't read or write from this account
     #[account(mut, signer)]
     pub initializer: AccountInfo<'info>,
@@ -173,7 +187,7 @@ impl<'info> Initialize<'info> {
     }
 }
 
-impl<'info> Cancel<'info> {
+impl<'info> Withdrawl<'info> {
     fn into_transfer_to_initializer_context(
         &self,
     ) -> CpiContext<'_, '_, '_, 'info, Transfer<'info>> {

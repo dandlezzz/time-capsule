@@ -116,6 +116,7 @@ describe('anchor-escrow', () => {
       vault_account_bump,
       new anchor.BN(initializerAmount),
       new anchor.BN(takerAmount),
+      new anchor.BN(9662166776),
       {
         accounts: {
           initializer: initializerMainAccount.publicKey,
@@ -155,6 +156,10 @@ describe('anchor-escrow', () => {
       _escrowAccount.initializerReceiveTokenAccount.equals(initializerTokenAccountB)
     );
   });
+
+  it('withdraws the escrow', async () => {
+    
+  })
 
 
 });
