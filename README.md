@@ -16,11 +16,3 @@ This code borrows heavily from the anchor-escrow program. It's quite simple. Two
 ### withdraw: 
   closes the escrow account, returns tokens if and only if the clock is passed the lock_until.
   
-  
-  
-
-
-### TODO
-- tests for withdraw
-- Proof of Hodl site, boilerplate, arweave deployment.
-- Functionality on PoH site.

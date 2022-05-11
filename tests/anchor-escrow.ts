@@ -135,6 +135,7 @@ describe('anchor-escrow', () => {
 
     let _initializerTokenAccountA = await mintA.getAccountInfo(initializerTokenAccountA);
     assert.ok(_initializerTokenAccountA.amount.toNumber() != initializerAmount);
+    
     await program.rpc.withdrawl(
       {
         accounts: {
