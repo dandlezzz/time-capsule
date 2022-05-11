@@ -15,7 +15,6 @@ pub mod anchor_escrow {
         ctx: Context<Initialize>,
         _vault_account_bump: u8,
         initializer_amount: u64,
-        taker_amount: u64,
         lock_until: i64,
     ) -> Result<()> {
         ctx.accounts.escrow_account.initializer_key = *ctx.accounts.initializer.key;
@@ -26,23 +25,7 @@ pub mod anchor_escrow {
             .initializer_deposit_token_account
             .to_account_info()
             .key;
-        ctx.accounts
-            .escrow_account
-            .initializer_receive_token_account = *ctx
-            .accounts
-            .initializer_receive_token_account
-            .to_account_info()
-            .key;
         ctx.accounts.escrow_account.initializer_amount = initializer_amount;
-        ctx.accounts.escrow_account.taker_amount = taker_amount;
-
-        let clock = Clock::get()?;
-
-        require!(
-            lock_until > clock.unix_timestamp + 5000,
-            EscrowCreationError::TimestampNotFarEnoughIntoTheFuture
-        );
-
         ctx.accounts.escrow_account.lock_until = lock_until;
 
         let (vault_authority, _vault_authority_bump) =
@@ -122,7 +105,6 @@ pub struct Initialize<'info> {
         constraint = initializer_deposit_token_account.amount >= initializer_amount
     )]
     pub initializer_deposit_token_account: Account<'info, TokenAccount>,
-    pub initializer_receive_token_account: Account<'info, TokenAccount>,
     #[account(zero)]
     pub escrow_account: Box<Account<'info, EscrowAccount>>,
     /// CHECK: This is not dangerous because we don't read or write from this account
@@ -159,7 +141,6 @@ pub struct Withdrawl<'info> {
 pub struct EscrowAccount {
     pub initializer_key: Pubkey,
     pub initializer_deposit_token_account: Pubkey,
-    pub initializer_receive_token_account: Pubkey,
     pub initializer_amount: u64,
     pub taker_amount: u64,
     pub lock_until: i64,
