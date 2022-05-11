@@ -21,8 +21,6 @@ This code borrows heavily from the anchor-escrow program. It's quite simple. Two
 
 
 ### TODO
-- Verify that lock_until is sufficient in the future
-- Change cancel instruction name to withdraw
 - tests for withdraw
 - Proof of Hodl site, boilerplate, arweave deployment.
 - Functionality on PoH site.
